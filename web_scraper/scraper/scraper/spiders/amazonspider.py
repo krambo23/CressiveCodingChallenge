@@ -11,7 +11,13 @@ class AmazonSpider(scrapy.Spider):
 
     def start_requests(self):
         # TODO : Fetch Keyword List From Database
-        keyword_list = ["ipad"]
+        keyword_list = [
+            "ipad",
+            # "cat food",
+            # "dog food",
+            # "car parts",
+            # "gym clothes men"
+        ]
         for keyword in keyword_list:
             amazon_url = urljoin(self.base_url, f"s?k={quote(keyword)}&page=1")
             yield scrapy.Request(url=amazon_url, callback=self.parse_search, dont_filter=True,
@@ -43,6 +49,7 @@ class AmazonSpider(scrapy.Spider):
 
         # region Sponsor Type 2 and Organic
         # Get All ASINs in Order - Element Must Have A "data-index" Value And A "data-asin" Value
+
         # Check for 'data-index'
         for node in response.css('[data-index]'):
 
@@ -106,8 +113,8 @@ class AmazonSpider(scrapy.Spider):
                                          meta={"keyword": keyword, "page": page_number})
 
     def parse_product_details(self, response):
-        description = [bullet.strip() for bullet in response.css("#feature-bullets li ::text").get()]
-
+        description = response.css("#feature-bullets li ::text").getall()
+        description = "\n".join([bullet.strip().strip() for bullet in description])
         # region Handle Sponsored Type 1 and Issues Caused By Amazon Limiting Scraping (E503)
         # Title
         try:
