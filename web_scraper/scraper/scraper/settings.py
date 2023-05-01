@@ -53,8 +53,8 @@ ROBOTSTXT_OBEY = False
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-   "scraper.middlewares.ScrapeOpsFakeUserAgentMiddleware": 100,
-   "scraper.middlewares.ScrapeOpsFakeBrowserHeaderMiddleware": 100,
+   "scraper.middlewares.ScrapeOpsFakeUserAgentMiddleware": 400,
+   "scraper.middlewares.ScrapeOpsFakeBrowserHeaderMiddleware": 400,
 }
 
 # Enable or disable extensions
