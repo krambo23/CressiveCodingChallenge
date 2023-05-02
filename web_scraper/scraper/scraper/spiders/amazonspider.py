@@ -1,6 +1,12 @@
 import scrapy
 from urllib.parse import quote, urljoin
 from datetime import datetime
+import os
+from pathlib import Path
+
+from sqlalchemy import create_engine, Column, String
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 
 class AmazonSpider(scrapy.Spider):
@@ -10,15 +16,23 @@ class AmazonSpider(scrapy.Spider):
     base_url = "https://www.amazon.co.uk/"
 
     def start_requests(self):
-        # TODO : Fetch Keyword List From Database
-        keyword_list = [
-            "ipad",
-            # "cat food",
-            # "dog food",
-            # "car parts",
-            # "gym clothes men"
-        ]
-        for keyword in keyword_list:
+        current_working_directory = os.getcwd()
+        db_directory = os.path.join(str(Path(current_working_directory).parents[1]), "db.sqlite3")
+
+        # SQLAlchemy
+        engine = create_engine(f"sqlite:///{db_directory}", echo=True)
+        Session = sessionmaker(bind=engine)
+        session = Session()
+        Base = declarative_base()
+
+        class Keywords(Base):
+            __tablename__ = "scraper_config_keywords"
+            keyword = Column(String(200), primary_key=True)
+
+        keywords = session.query(Keywords).all()
+
+        for keyword in keywords:
+            keyword = str(keyword.keyword)
             amazon_url = urljoin(self.base_url, f"s?k={quote(keyword)}&page=1")
             yield scrapy.Request(url=amazon_url, callback=self.parse_search, dont_filter=True,
                                  meta={"keyword": keyword, "page": 1})
@@ -64,7 +78,7 @@ class AmazonSpider(scrapy.Spider):
                 asin = node.css('[data-asin] ::attr(data-asin)').get().strip()
                 index = node.css('[data-index] ::attr(data-index)').get().strip()
 
-                if asin is not "" and index is not "":
+                if asin != "" and index != "":
 
                     # Grab Result
                     if node.css('.a-section.a-spacing-small.a-spacing-top-small'):
