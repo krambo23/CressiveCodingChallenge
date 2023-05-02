@@ -2,7 +2,6 @@ import scrapy
 from urllib.parse import quote, urljoin
 from datetime import datetime
 import os
-from pathlib import Path
 
 from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.orm import sessionmaker
@@ -16,8 +15,7 @@ class AmazonSpider(scrapy.Spider):
     base_url = "https://www.amazon.co.uk/"
 
     def start_requests(self):
-        current_working_directory = os.getcwd()
-        db_directory = os.path.join(str(Path(current_working_directory).parents[1]), "db.sqlite3")
+        db_directory = os.environ["SQLITE_PATH"]
 
         # SQLAlchemy
         engine = create_engine(f"sqlite:///{db_directory}", echo=True)

@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from .models import ScrapedTable, ScraperStatus
 from .serializers import ScrapedTableSerializers
+# from scraper import main
 
 
 # API Endpoints
@@ -38,6 +39,7 @@ def index(request):
 
 def start_scraping(request):
     # TODO : Add Code For Triggering Scraper
+    # main.main()
     return render(request, "start.html")
 
 

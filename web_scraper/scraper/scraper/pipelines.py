@@ -6,7 +6,6 @@
 
 # useful for handling different item types with a single interface
 import os
-from pathlib import Path
 from datetime import datetime
 
 from itemadapter import ItemAdapter
@@ -65,8 +64,7 @@ class AmazonScraperPipeline:
 
 class SaveToDatabasePipeline:
     def __init__(self):
-        current_working_directory = os.getcwd()
-        db_directory = os.path.join(str(Path(current_working_directory).parents[1]), "db.sqlite3")
+        db_directory = os.environ["SQLITE_PATH"]
 
         # SQLAlchemy
         self.engine = create_engine(f"sqlite:///{db_directory}", echo=True)
