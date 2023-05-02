@@ -4,7 +4,7 @@ from datetime import datetime
 import os
 from pathlib import Path
 
-from sqlalchemy import create_engine, Column, String
+from sqlalchemy import create_engine, Column, String, Integer
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -27,7 +27,8 @@ class AmazonSpider(scrapy.Spider):
 
         class Keywords(Base):
             __tablename__ = "scraper_config_keywords"
-            keyword = Column(String(200), primary_key=True)
+            id = Column(Integer, primary_key=True)
+            keyword = Column(String(200))
 
         keywords = session.query(Keywords).all()
 

@@ -31,6 +31,11 @@ class AmazonScraperPipeline:
                 elif isinstance(value, tuple):
                     adapter[field_name] = value[0].strip()
 
+        for field_name in field_names:
+            value = adapter.get(field_name)
+            if value is None:
+                adapter[field_name] = ""
+
         # Convert "Price" to Float
         try:
             price = adapter.get("price")
@@ -70,6 +75,7 @@ class SaveToDatabasePipeline:
 
     class ScrapedTable(declarative_base()):
         __tablename__ = "scraper_config_scrapedtable"
+        id = Column(Integer, primary_key=True)
         title = Column(String(200))
         description = Column(String(500))
         price = Column(Float)
@@ -78,8 +84,8 @@ class SaveToDatabasePipeline:
         page_number = Column(Integer)
         search_result_position = Column(Integer)
         is_sponsored = Column(Boolean)
-        keyword_id = Column(String(200))
-        date_time_scraped = Column(DateTime, primary_key=True)
+        keyword = Column(String(200))
+        date_time_scraped = Column(DateTime)
 
     def process_item(self, item, spider):
         date_time_scraped = datetime.fromisoformat(item["date_time_scraped"])
@@ -92,7 +98,7 @@ class SaveToDatabasePipeline:
             page_number=item["page_number"],
             search_result_position=item["search_result_position"],
             is_sponsored=item["is_sponsored"],
-            keyword_id=item["keyword"],
+            keyword=item["keyword"],
             date_time_scraped=date_time_scraped
         ))
 
