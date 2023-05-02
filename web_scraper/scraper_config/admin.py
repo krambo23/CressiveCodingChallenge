@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Keywords, ScraperStatus
 
-# Register your models here.
+
+admin.site.register(Keywords)
+admin.site.register(ScraperStatus)
