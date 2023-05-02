@@ -36,6 +36,7 @@ class AmazonSpider(scrapy.Spider):
             amazon_url = urljoin(self.base_url, f"s?k={quote(keyword)}&page=1")
             yield scrapy.Request(url=amazon_url, callback=self.parse_search, dont_filter=True,
                                  meta={"keyword": keyword, "page": 1})
+        session.close()
 
     def parse_search(self, response):
         keyword = response.meta["keyword"]

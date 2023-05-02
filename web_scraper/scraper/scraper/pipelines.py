@@ -5,7 +5,15 @@
 
 
 # useful for handling different item types with a single interface
+import os
+from pathlib import Path
+from datetime import datetime
+
 from itemadapter import ItemAdapter
+
+from sqlalchemy import create_engine, Column, String, Float, Integer, Boolean, DateTime
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
 
 class AmazonScraperPipeline:
@@ -27,7 +35,7 @@ class AmazonScraperPipeline:
         try:
             price = adapter.get("price")
 
-            if price is "":
+            if price == "":
                 price = -1
 
             price = price.replace("£", "")
@@ -39,7 +47,7 @@ class AmazonScraperPipeline:
         try:
             rating = adapter.get("rating").strip()
 
-            if rating is "":
+            if rating == "":
                 rating = -1
 
             rating = rating.replace(" out of 5 stars", "")
@@ -48,3 +56,48 @@ class AmazonScraperPipeline:
             adapter["rating"] = -1
 
         return item
+
+
+class SaveToDatabasePipeline:
+    def __init__(self):
+        current_working_directory = os.getcwd()
+        db_directory = os.path.join(str(Path(current_working_directory).parents[1]), "db.sqlite3")
+
+        # SQLAlchemy
+        self.engine = create_engine(f"sqlite:///{db_directory}", echo=True)
+        Session = sessionmaker(bind=self.engine)
+        self.session = Session()
+
+    class ScrapedTable(declarative_base()):
+        __tablename__ = "scraper_config_scrapedtable"
+        title = Column(String(200))
+        description = Column(String(500))
+        price = Column(Float)
+        rating = Column(Float)
+        asin = Column(String(10))
+        page_number = Column(Integer)
+        search_result_position = Column(Integer)
+        is_sponsored = Column(Boolean)
+        keyword_id = Column(String(200))
+        date_time_scraped = Column(DateTime, primary_key=True)
+
+    def process_item(self, item, spider):
+        date_time_scraped = datetime.fromisoformat(item["date_time_scraped"])
+        self.session.add(self.ScrapedTable(
+            title=item["title"],
+            description=item["description"],
+            price=item["price"],
+            rating=item["rating"],
+            asin=item["asin"],
+            page_number=item["page_number"],
+            search_result_position=item["search_result_position"],
+            is_sponsored=item["is_sponsored"],
+            keyword_id=item["keyword"],
+            date_time_scraped=date_time_scraped
+        ))
+
+        self.session.commit()
+        return item
+
+    def close_spider(self, spider):
+        self.session.close()
