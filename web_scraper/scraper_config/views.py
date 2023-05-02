@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
-from .models import ScrapedTable
+from .models import ScrapedTable, ScraperStatus
 from .serializers import ScrapedTableSerializers
 
 
@@ -33,12 +33,17 @@ def get_scraped_data(request):
 
 # Views
 def index(request):
-    return HttpResponse("Hello World")
+    return render(request, "index.html")
 
 
 def start_scraping(request):
-    return HttpResponse("Scraping Started! - Check Progress On get_scraper_logs()")
+    # TODO : Add Code For Triggering Scraper
+    return render(request, "start.html")
 
 
 def get_scraper_logs(request):
-    return HttpResponse("Scraper Logs")
+    latest_scraper_logs = ScraperStatus.objects.order_by("scraper_last_ran")
+    context = {
+        "latest_scraper_logs": latest_scraper_logs
+    }
+    return render(request, "logs.html", context)

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="text-center">
+    <h1>Scraper Logs</h1>
+    {% if latest_scraper_logs %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Message</th>
+                    <th scope="col">Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in latest_scraper_logs %}
+                    <tr>
+                        <td>{{ log.scraper_status }}</td>
+                        <td>{{ log.scraper_last_ran }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    <h2 class="text-danger">No Logs</h2>
+    {% endif %}
+</div>
+
+{% endblock content %}

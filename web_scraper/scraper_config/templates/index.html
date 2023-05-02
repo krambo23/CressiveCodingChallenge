@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="text-center">
+    <a href="{% url 'scraper_config:api' %}" class="btn btn-primary">Query Database</a>
+    &nbsp;&nbsp;
+    <a href="{% url 'scraper_config:start_scraping' %}" class="btn btn-success">Start Scraper</a>
+    &nbsp;&nbsp;
+    <a href="{% url 'scraper_config:scraper_logs' %}" class="btn btn-secondary">Scraper Logs</a>
+</div>
+
+{% endblock content %}
